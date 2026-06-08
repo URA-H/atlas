@@ -1,0 +1,125 @@
+// atlas — Prisma schema
+// Postgres (Neon free tier). Auth.js v5 + custom coffee karte models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────── Auth.js v5 ───────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  emailVerified DateTime?
+  name      String?
+  image     String?
+  username  String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  coffees   Coffee[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────── Coffee karte ───────────────────
+
+enum RoastLevel {
+  LIGHT
+  MEDIUM_LIGHT
+  MEDIUM
+  MEDIUM_DARK
+  DARK
+}
+
+model Coffee {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 基本情報
+  name      String      // "Yirgacheffe" 等
+  roaster   String?     // ロースター / カフェ
+  origin    String?     // 産地国 "Ethiopia"
+  region    String?     // 詳細産地 "Yirgacheffe"
+  roastLevel RoastLevel?
+
+  // 抽出
+  brewMethod String?    // V60, Aeropress, Espresso, FrenchPress, Other
+  brewTemp   Int?       // ℃
+  brewRatio  String?    // "1:16"
+  doseG      Float?     // g
+  waterMl    Int?       // ml
+
+  // テイスティング
+  notes String?         // 紀行文風メモ (markdown 可)
+
+  // 評価 (各 0-10、null 可)
+  scoreAcidity    Int?
+  scoreSweetness  Int?
+  scoreBitterness Int?
+  scoreBody       Int?
+  scoreAftertaste Int?
+  scoreOverall    Int?
+
+  // SCA フレーバーホイール選択 (例: ["Fruity>Berry>Blueberry", "Floral>Floral>Jasmine"])
+  flavors String[]      @default([])
+
+  // 写真 (Vercel Blob の公開 URL)
+  photoUrl String?
+
+  // メタ
+  drankAt   DateTime?   // 飲んだ日時
+  isPublic  Boolean     @default(true)
+  isDraft   Boolean     @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
