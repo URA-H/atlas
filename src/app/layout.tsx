@@ -30,9 +30,26 @@ const notoJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "atlas — コーヒーで世界を旅する",
+  metadataBase: new URL("https://atlas-eight-mauve.vercel.app"),
+  title: {
+    default: "atlas — コーヒーで世界を旅する",
+    template: "%s",
+  },
   description:
     "飲んだ一杯を、産地と風味と一緒に綴じていく。コーヒーで世界を旅するように、自分のテイスティング体験を 1 冊の地図帳に。",
+  openGraph: {
+    title: "atlas — コーヒーで世界を旅する",
+    description:
+      "飲んだ一杯を、産地と風味と一緒に綴じていく。コーヒーで世界を旅するように、自分のテイスティング体験を 1 冊の地図帳に。",
+    siteName: "atlas",
+    type: "website",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "atlas — コーヒーで世界を旅する",
+    description: "飲んだ一杯を、産地と風味と一緒に綴じていく。",
+  },
 };
 
 export default function RootLayout({
