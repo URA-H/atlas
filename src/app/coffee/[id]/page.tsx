@@ -34,14 +34,31 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { id } = await params;
   const coffee = await prisma.coffee.findUnique({
     where: { id },
-    select: { name: true, region: true, origin: true, roaster: true },
+    select: { name: true, region: true, origin: true, roaster: true, isPublic: true },
   });
-  if (!coffee) return { title: "atlas" };
+  if (!coffee || !coffee.isPublic) return { title: "atlas" };
 
   const subtitle = [coffee.origin, coffee.region].filter(Boolean).join(" · ");
+  const title = `${coffee.name}${subtitle ? ` · ${subtitle}` : ""} — atlas`;
+  const description = coffee.roaster
+    ? `${coffee.roaster} の ${coffee.name} のテイスティングノート`
+    : `${coffee.name} のテイスティングノート`;
+
   return {
-    title: `${coffee.name}${subtitle ? ` · ${subtitle}` : ""} — atlas`,
-    description: `${coffee.roaster ?? ""} の ${coffee.name} のテイスティングノート`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/coffee/${id}`,
+      siteName: "atlas",
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
