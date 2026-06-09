@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
+import { coffeeImageUrl } from "@/lib/coffee-image";
 
 export const metadata = {
   title: "あなたの地図帳 — atlas",
@@ -24,7 +25,6 @@ export default async function MyLibraryPage() {
       roastLevel: true,
       drankAt: true,
       createdAt: true,
-      photoUrl: true,
     },
   });
 
@@ -91,7 +91,6 @@ type CoffeeCard = {
   roastLevel: string | null;
   drankAt: Date | null;
   createdAt: Date;
-  photoUrl: string | null;
 };
 
 function CoffeeGrid({ coffees }: { coffees: CoffeeCard[] }) {
@@ -101,25 +100,38 @@ function CoffeeGrid({ coffees }: { coffees: CoffeeCard[] }) {
         <Link
           key={c.id}
           href={`/coffee/${c.id}`}
-          className="group rounded-2xl border border-border bg-paper p-5 transition-colors hover:border-primary/60"
+          className="group overflow-hidden rounded-2xl border border-border bg-paper transition-colors hover:border-primary/60"
         >
-          <div
-            className="font-hand mb-1 text-[16px] text-ink-muted"
-            style={{ transform: "rotate(-1deg)", display: "inline-block" }}
-          >
-            no. {String(coffees.length - i).padStart(3, "0")}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={coffeeImageUrl(c.id)}
+            alt=""
+            width={1024}
+            height={1024}
+            loading="lazy"
+            decoding="async"
+            className="block w-full bg-muted"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
+          <div className="p-5">
+            <div
+              className="font-hand mb-1 text-[16px] text-ink-muted"
+              style={{ transform: "rotate(-1deg)", display: "inline-block" }}
+            >
+              no. {String(coffees.length - i).padStart(3, "0")}
+            </div>
+            <h3 className="mb-2 text-[18px] group-hover:text-primary">{c.name}</h3>
+            {c.region && (
+              <p className="mb-1 text-[13px] text-ink-soft">
+                {[c.origin, c.region].filter(Boolean).join(" · ")}
+              </p>
+            )}
+            {c.roaster && (
+              <p className="text-[12px] uppercase tracking-wider text-ink-muted">
+                {c.roaster}
+              </p>
+            )}
           </div>
-          <h3 className="mb-2 text-[18px] group-hover:text-primary">{c.name}</h3>
-          {c.region && (
-            <p className="mb-1 text-[13px] text-ink-soft">
-              {[c.origin, c.region].filter(Boolean).join(" · ")}
-            </p>
-          )}
-          {c.roaster && (
-            <p className="text-[12px] uppercase tracking-wider text-ink-muted">
-              {c.roaster}
-            </p>
-          )}
         </Link>
       ))}
     </div>

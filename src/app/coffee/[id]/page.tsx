@@ -4,6 +4,7 @@ import type { RoastLevel } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
+import { coffeeImageUrl } from "@/lib/coffee-image";
 
 const ROAST_LABEL: Record<RoastLevel, string> = {
   LIGHT: "Light",
@@ -103,6 +104,30 @@ export default async function CoffeeDetailPage({ params }: { params: Params }) {
             </Link>
           )}
         </div>
+
+        {/* AI watercolor hero (proxied through /api/coffee/[id]/image) */}
+        <figure
+          className="relative mb-10 overflow-hidden rounded-2xl border border-border bg-muted"
+          style={{ transform: "rotate(-0.3deg)" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={coffeeImageUrl(coffee.id)}
+            alt={`${coffee.name} の水彩イラスト`}
+            width={1024}
+            height={1024}
+            loading="eager"
+            decoding="async"
+            className="block w-full"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+          />
+          <figcaption
+            className="font-hand absolute bottom-2 right-3 text-[15px] text-paper/80"
+            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.35)" }}
+          >
+            a watercolor by atlas
+          </figcaption>
+        </figure>
 
         {/* Title */}
         <h1
