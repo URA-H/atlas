@@ -1,44 +1,22 @@
+import Link from "next/link";
 import { RoughUnderline } from "@/components/decorations/rough-underline";
 import { RoughFrame } from "@/components/decorations/rough-frame";
+import { SiteHeader } from "@/components/site-header";
+import { auth } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <Hero />
+      <Hero isAuthenticated={!!session?.user} />
       <Features />
       <SiteFooter />
     </div>
   );
 }
 
-function SiteHeader() {
-  return (
-    <header className="py-7">
-      <div className="mx-auto flex max-w-[1080px] items-center justify-between px-7">
-        <a href="/" className="flex items-center gap-2.5 text-ink no-underline">
-          <CompassMark className="size-6 text-primary" />
-          <span
-            className="text-[22px] font-medium tracking-tight"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            atlas
-          </span>
-        </a>
-        <nav className="flex items-center gap-5">
-          <a className="text-sm font-medium text-ink-soft hover:text-ink" href="#">
-            使い方
-          </a>
-          <a className="text-sm font-medium text-ink-soft hover:text-ink" href="#">
-            ログイン
-          </a>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function Hero() {
+function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <section className="relative overflow-hidden pt-14 pb-24">
       <CompassRose className="pointer-events-none absolute -right-16 top-0 size-[520px] text-primary opacity-[0.07]" />
@@ -81,13 +59,25 @@ function Hero() {
         </p>
 
         <div className="flex flex-wrap items-center gap-3.5">
-          <button className="inline-flex items-center gap-2 rounded-full bg-primary px-[22px] py-[13px] text-[15px] font-medium text-primary-foreground transition-all hover:-translate-y-px hover:bg-ink">
+          <Link
+            href={isAuthenticated ? "/my" : "/login"}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-[22px] py-[13px] text-[15px] font-medium text-primary-foreground transition-all hover:-translate-y-px hover:bg-ink"
+          >
             地図帳を開く
             <ArrowRight className="size-4" />
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-full border border-border bg-transparent px-[22px] py-[13px] text-[15px] font-medium text-ink transition-all hover:bg-muted">
-            使い方を見る
-          </button>
+          </Link>
+          {isAuthenticated ? (
+            <Link
+              href="/new"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-transparent px-[22px] py-[13px] text-[15px] font-medium text-ink transition-all hover:bg-muted"
+            >
+              新しい一杯を綴じる
+            </Link>
+          ) : (
+            <button className="inline-flex items-center gap-2 rounded-full border border-border bg-transparent px-[22px] py-[13px] text-[15px] font-medium text-ink transition-all hover:bg-muted">
+              使い方を見る
+            </button>
+          )}
         </div>
 
         <p
@@ -195,25 +185,6 @@ function SiteFooter() {
 }
 
 /* ─────────────── Hand-drawn SVG marks (inline) ─────────────── */
-
-function CompassMark({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 32 32"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="16" cy="16" r="12.5" />
-      <path d="M16 4 L18 16 L16 28 L14 16 Z" fill="currentColor" stroke="none" />
-      <path d="M4 16 L16 14 L28 16 L16 18 Z" />
-    </svg>
-  );
-}
 
 function CompassRose({ className }: { className?: string }) {
   return (
