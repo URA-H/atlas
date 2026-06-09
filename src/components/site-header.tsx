@@ -21,7 +21,7 @@ export async function SiteHeader() {
             <>
               <Link
                 href="/my"
-                className="text-sm font-medium text-ink-soft hover:text-ink"
+                className="hidden text-sm font-medium text-ink-soft hover:text-ink sm:inline"
               >
                 あなたの地図帳
               </Link>
@@ -30,6 +30,27 @@ export async function SiteHeader() {
                 className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-all hover:-translate-y-px hover:bg-ink"
               >
                 新しい一杯
+              </Link>
+              <Link
+                href="/my"
+                className="flex size-8 items-center justify-center overflow-hidden rounded-full border border-border bg-paper transition-colors hover:border-primary"
+                aria-label={session.user.name ?? "your library"}
+              >
+                {session.user.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={session.user.image}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="block size-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="text-xs font-medium text-ink-muted">
+                    {(session.user.name ?? "?").slice(0, 1).toUpperCase()}
+                  </span>
+                )}
               </Link>
               <form
                 action={async () => {

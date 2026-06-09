@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FlavorWheel } from "@/components/flavor-wheel/flavor-wheel";
-import { createCoffee } from "@/app/new/actions";
 
 const ROAST_OPTIONS = [
   { value: "LIGHT", label: "Light", color: "oklch(0.65 0.08 60)" },
@@ -22,20 +21,50 @@ const SCORE_FIELDS = [
   { key: "scoreAftertaste", label: "余韻", hint: "aftertaste" },
 ] as const;
 
-export function NewCoffeeForm() {
-  const [flavors, setFlavors] = useState<string[]>([]);
-  const [roastLevel, setRoastLevel] = useState<string>("");
-  const [brewMethod, setBrewMethod] = useState<string>("");
+export type CoffeeFormInitial = {
+  id?: string;
+  name?: string;
+  roaster?: string | null;
+  origin?: string | null;
+  region?: string | null;
+  roastLevel?: string | null;
+  brewMethod?: string | null;
+  brewTemp?: number | null;
+  brewRatio?: string | null;
+  doseG?: number | null;
+  waterMl?: number | null;
+  notes?: string | null;
+  scoreAcidity?: number | null;
+  scoreSweetness?: number | null;
+  scoreBitterness?: number | null;
+  scoreBody?: number | null;
+  scoreAftertaste?: number | null;
+  flavors?: string[];
+};
+
+export function CoffeeForm({
+  initial,
+  action,
+  submitLabel,
+}: {
+  initial?: CoffeeFormInitial;
+  action: (formData: FormData) => Promise<void> | void;
+  submitLabel: string;
+}) {
+  const [flavors, setFlavors] = useState<string[]>(initial?.flavors ?? []);
+  const [roastLevel, setRoastLevel] = useState<string>(initial?.roastLevel ?? "");
+  const [brewMethod, setBrewMethod] = useState<string>(initial?.brewMethod ?? "");
   const [scores, setScores] = useState<Record<string, number>>({
-    scoreAcidity: 5,
-    scoreSweetness: 5,
-    scoreBitterness: 5,
-    scoreBody: 5,
-    scoreAftertaste: 5,
+    scoreAcidity: initial?.scoreAcidity ?? 5,
+    scoreSweetness: initial?.scoreSweetness ?? 5,
+    scoreBitterness: initial?.scoreBitterness ?? 5,
+    scoreBody: initial?.scoreBody ?? 5,
+    scoreAftertaste: initial?.scoreAftertaste ?? 5,
   });
 
   return (
-    <form action={createCoffee} className="flex flex-col gap-14">
+    <form action={action} className="flex flex-col gap-14">
+      {initial?.id && <input type="hidden" name="id" value={initial.id} />}
       <input type="hidden" name="flavors" value={JSON.stringify(flavors)} />
       <input type="hidden" name="roastLevel" value={roastLevel} />
       <input type="hidden" name="brewMethod" value={brewMethod} />
@@ -46,6 +75,7 @@ export function NewCoffeeForm() {
           <input
             name="name"
             required
+            defaultValue={initial?.name ?? ""}
             placeholder="例: Yirgacheffe"
             className={inputCls}
           />
@@ -53,6 +83,7 @@ export function NewCoffeeForm() {
         <Field label="ロースター / カフェ">
           <input
             name="roaster"
+            defaultValue={initial?.roaster ?? ""}
             placeholder="例: FUGLEN COFFEE ROASTERS"
             className={inputCls}
           />
@@ -61,6 +92,7 @@ export function NewCoffeeForm() {
           <Field label="産地（国）">
             <input
               name="origin"
+              defaultValue={initial?.origin ?? ""}
               placeholder="例: Ethiopia"
               className={inputCls}
             />
@@ -68,6 +100,7 @@ export function NewCoffeeForm() {
           <Field label="詳細産地">
             <input
               name="region"
+              defaultValue={initial?.region ?? ""}
               placeholder="例: Yirgacheffe"
               className={inputCls}
             />
@@ -129,16 +162,46 @@ export function NewCoffeeForm() {
         </Field>
         <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
           <Field label="温度 ℃">
-            <input name="brewTemp" type="number" step="1" min="0" max="100" placeholder="92" className={inputCls} />
+            <input
+              name="brewTemp"
+              type="number"
+              step="1"
+              min="0"
+              max="100"
+              defaultValue={initial?.brewTemp ?? ""}
+              placeholder="92"
+              className={inputCls}
+            />
           </Field>
           <Field label="豆量 g">
-            <input name="doseG" type="number" step="0.1" min="0" placeholder="15" className={inputCls} />
+            <input
+              name="doseG"
+              type="number"
+              step="0.1"
+              min="0"
+              defaultValue={initial?.doseG ?? ""}
+              placeholder="15"
+              className={inputCls}
+            />
           </Field>
           <Field label="湯量 ml">
-            <input name="waterMl" type="number" step="1" min="0" placeholder="240" className={inputCls} />
+            <input
+              name="waterMl"
+              type="number"
+              step="1"
+              min="0"
+              defaultValue={initial?.waterMl ?? ""}
+              placeholder="240"
+              className={inputCls}
+            />
           </Field>
           <Field label="比率">
-            <input name="brewRatio" placeholder="1:16" className={inputCls} />
+            <input
+              name="brewRatio"
+              defaultValue={initial?.brewRatio ?? ""}
+              placeholder="1:16"
+              className={inputCls}
+            />
           </Field>
         </div>
       </Section>
@@ -152,10 +215,7 @@ export function NewCoffeeForm() {
           風味の地図
         </p>
         <div className="mb-10 rounded-2xl border border-border bg-paper p-5 sm:p-7">
-          <FlavorWheel
-            initialSelected={flavors}
-            onChange={setFlavors}
-          />
+          <FlavorWheel initialSelected={flavors} onChange={setFlavors} />
         </div>
 
         <p
@@ -184,6 +244,7 @@ export function NewCoffeeForm() {
           <textarea
             name="notes"
             rows={6}
+            defaultValue={initial?.notes ?? ""}
             placeholder="朝のヒンヤリした風と、カップから昇る花の香り。今日のエチオピアは、果実というより、花だった。"
             className={`${inputCls} min-h-[150px] resize-y leading-relaxed`}
             style={{ fontFamily: "var(--font-sans)" }}
@@ -197,7 +258,7 @@ export function NewCoffeeForm() {
           type="submit"
           className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-medium text-primary-foreground transition-all hover:-translate-y-px hover:bg-ink"
         >
-          綴じる
+          {submitLabel}
           <ArrowRight className="size-4" />
         </button>
       </div>
@@ -222,7 +283,10 @@ function Section({
       <div className="mb-6 flex items-baseline gap-3 border-b border-border pb-2">
         <h2
           className="text-[24px] tracking-tight"
-          style={{ fontFamily: "var(--font-heading)", fontVariationSettings: '"opsz" 36, "SOFT" 40' }}
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontVariationSettings: '"opsz" 36, "SOFT" 40',
+          }}
         >
           {title}
         </h2>

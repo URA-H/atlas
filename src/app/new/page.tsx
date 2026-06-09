@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { SiteHeader } from "@/components/site-header";
-import { NewCoffeeForm } from "@/components/forms/new-coffee-form";
+import { CoffeeForm } from "@/components/forms/coffee-form";
+import { createCoffee } from "@/app/new/actions";
 
 export const metadata = {
   title: "新しい一杯 — atlas",
@@ -31,7 +32,7 @@ export default async function NewCoffeePage() {
           今日のカップから、地図帳の頁が一つ加わります。
         </p>
 
-        <NewCoffeeForm />
+        <CoffeeForm action={createCoffee} submitLabel="綴じる" />
       </main>
     </div>
   );

@@ -96,12 +96,21 @@ export default async function CoffeeDetailPage({ params }: { params: Params }) {
             atlas of @{coffee.user.name ?? "anon"}
           </span>
           {isOwner && (
-            <Link
-              href="/my"
-              className="text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline"
-            >
-              ← 地図帳に戻る
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link
+                href={`/coffee/${coffee.id}/edit`}
+                className="inline-flex items-center gap-1.5 text-sm text-ink-soft underline-offset-4 hover:text-primary"
+              >
+                <PencilIcon className="size-3.5" />
+                書き直す
+              </Link>
+              <Link
+                href="/my"
+                className="text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline"
+              >
+                ← 地図帳
+              </Link>
+            </div>
           )}
         </div>
 
@@ -262,5 +271,23 @@ export default async function CoffeeDetailPage({ params }: { params: Params }) {
         </div>
       </main>
     </div>
+  );
+}
+
+function PencilIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
   );
 }
